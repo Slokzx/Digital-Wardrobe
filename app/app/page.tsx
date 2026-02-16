@@ -79,14 +79,14 @@ function WardrobeGrid() {
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       sizes="(max-width: 768px) 50vw, 20vw"
-                      unoptimized={item.imageUrl.includes('picsum')}
+                      unoptimized={item.imageUrl.includes('picsum') || item.imageUrl.includes('unsplash') || item.imageUrl.includes('pexels')}
                     />
                     <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1">
                       <Badge variant="secondary" className="text-xs">
                         {item.type}
                       </Badge>
                       {item.color && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="secondary" className="text-xs">
                           {item.color}
                         </Badge>
                       )}

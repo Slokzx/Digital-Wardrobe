@@ -4,13 +4,13 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useTheme } from '@/components/ThemeProvider';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/ui/Avatar';
 import { Toast, useToastAutoRemove } from '@/components/ui/Toast';
 import { useToastStore } from '@/stores/useToastStore';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, hydrated, setUser, setHydrated } = useAuthStore();

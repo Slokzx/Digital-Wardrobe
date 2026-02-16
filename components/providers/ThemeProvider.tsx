@@ -12,10 +12,8 @@ const ThemeContext = createContext<{
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const stored = localStorage.getItem('dw-theme') as Theme | null;
     const prefersDark = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initial = stored || (prefersDark ? 'dark' : 'light');
@@ -25,13 +23,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    localStorage.setItem('dw-theme', t);
+    if (typeof window !== 'undefined') localStorage.setItem('dw-theme', t);
     document.documentElement.classList.toggle('dark', t === 'dark');
   };
 
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
-
-  if (!mounted) return <>{children}</>;
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>

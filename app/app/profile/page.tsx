@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { useTheme } from '@/components/ThemeProvider';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { Avatar } from '@/components/ui/Avatar';
 
 export default function ProfilePage() {

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
@@ -37,11 +38,44 @@ export default function AddItemPage() {
   const [purchaseDate, setPurchaseDate] = useState('');
   const [notes, setNotes] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      addToast('Please select an image file (JPEG, PNG, WebP or GIF)', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      addToast('Image must be under 5MB', 'error');
+      return;
+    }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.set('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      setImageUrl(data.url);
+      setPreviewUrl(data.url);
+      addToast('Photo uploaded', 'success');
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Upload failed', 'error');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !type || !imageUrl.trim()) {
-      addToast('Name, type and image URL are required', 'error');
+    const finalImageUrl = imageUrl.trim();
+    if (!name.trim() || !type || !finalImageUrl) {
+      addToast('Name, type and a photo (upload or URL) are required', 'error');
       return;
     }
     setLoading(true);
@@ -58,7 +92,7 @@ export default function AddItemPage() {
           cost: cost ? Number(cost) : undefined,
           purchaseDate: purchaseDate || undefined,
           notes: notes.trim() || undefined,
-          imageUrl: imageUrl.trim(),
+          imageUrl: finalImageUrl,
         }),
       });
       const data = await res.json();
@@ -96,17 +130,49 @@ export default function AddItemPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium">Image URL *</label>
-                <Input
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://..."
-                  type="url"
-                  required
-                />
-                <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
-                  Use a direct image link, e.g. https://picsum.photos/seed/xyz/800/1000
-                </p>
+                <label className="mb-1 block text-sm font-medium">Photo *</label>
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? 'Uploading...' : 'Upload photo'}
+                    </Button>
+                    <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                      or paste a URL below
+                    </span>
+                  </div>
+                  <Input
+                    value={imageUrl}
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                      setPreviewUrl(e.target.value.trim() || null);
+                    }}
+                    placeholder="https://... or upload above"
+                    type="url"
+                  />
+                  {previewUrl && (
+                    <div className="relative aspect-[3/4] max-h-48 w-full overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
+                      <Image
+                        src={previewUrl}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                        unoptimized={previewUrl.includes('uploads')}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium">Type *</label>

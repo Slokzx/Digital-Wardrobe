@@ -71,7 +71,7 @@ export function ItemSheet({
                 fill
                 className="object-cover"
                 sizes="400px"
-                unoptimized={item.imageUrl.includes('picsum')}
+                unoptimized={item.imageUrl.includes('picsum') || item.imageUrl.includes('unsplash') || item.imageUrl.includes('pexels')}
               />
             </div>
             <dl className="grid gap-2 text-sm">

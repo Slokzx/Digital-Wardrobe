@@ -44,7 +44,7 @@ Create the SQLite DB and run migrations:
 npx prisma migrate dev --name init
 ```
 
-Seed the database with a demo user and 50 wardrobe items (placeholder images from Picsum):
+Seed the database with the master account and 50 wardrobe items (images from Pexels; requires `PEXELS_API_KEY` in `.env`):
 
 ```bash
 npm run db:seed
@@ -58,12 +58,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Demo account
+## Master account
 
 After seeding:
 
-- **Email:** `demo@wardrobe.app`
-- **Password:** `demo1234`
+- **Email:** `master@wardrobe.app`
+- **Password:** `master1234`
 
 ## Scripts
 
@@ -82,21 +82,24 @@ After seeding:
 
 ```
 app/
+  layout.tsx            # Root layout (fonts, ThemeProvider)
   page.tsx              # Landing
   auth/page.tsx         # Sign up / Log in
-  app/
-    layout.tsx          # Protected app shell (header, toasts)
+  dashboard/            # Authenticated area (/dashboard, /dashboard/add, /dashboard/profile)
+    layout.tsx          # Dashboard shell (header, nav, toasts)
     page.tsx            # Wardrobe grid + filters
-    add/page.tsx        # Add item form
-    profile/page.tsx    # Profile + theme + logout
+    add/page.tsx        # Add item form (with photo upload)
+    profile/page.tsx    # Profile, theme, logout
+    FilterPanel.tsx
+    ItemSheet.tsx
   api/
-    auth/signup, login, logout
+    auth/               # signup, login, logout
     me
-    wardrobe (GET list, POST create)
-    wardrobe/[id] (GET, DELETE)
+    wardrobe/           # GET list, POST create, GET/DELETE [id]
+    upload/             # POST (photo upload)
 components/
-  ThemeProvider.tsx
-  ui/                   # Button, Input, Select, Card, Sheet, etc.
+  providers/ThemeProvider.tsx
+  ui/                   # Button, Input, Select, Card, Sheet, Badge, etc.
 lib/
   db.ts, auth.ts, cn.ts
 stores/
@@ -104,6 +107,8 @@ stores/
 prisma/
   schema.prisma
   seed.ts
+docs/
+  DATA_FLOW.md          # Data flow diagrams (Mermaid)
 ```
 
 ## Features

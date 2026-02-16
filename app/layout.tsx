@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Sora } from 'next/font/google';
-import { ThemeProvider } from '@/components/ThemeProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import './globals.css';
 
 const inter = Inter({
